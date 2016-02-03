@@ -16,9 +16,9 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 
 public class FunctionalBar extends HBox {
-
-	Slider time = new Slider();
-	Slider vol = new Slider();
+	Slider volSlider = new Slider();
+	Slider timeSlider = new Slider();
+	
 
 	Button playButton = new Button("");
 	Button stopButton = new Button("");
@@ -38,11 +38,11 @@ public class FunctionalBar extends HBox {
 		setAlignment(Pos.CENTER);
 		setPadding(new Insets(5, 10, 5, 10));
 
-		vol.setPrefWidth(70);
-		vol.setMinWidth(30);
-		vol.setValue(100);
+		volSlider.setPrefWidth(70);
+		volSlider.setMinWidth(30);
+		volSlider.setValue(100);
 
-		HBox.setHgrow(time, Priority.ALWAYS);
+		HBox.setHgrow(timeSlider, Priority.ALWAYS);
 		playButton.setPrefSize(50, 20);
 		playButton.setPadding((new Insets(1)));
 		playButton.setText("Pause");
@@ -68,9 +68,9 @@ public class FunctionalBar extends HBox {
 		getChildren().add(playButton);
 		getChildren().add(stopButton);
 		getChildren().add(speedUpButton);
-		getChildren().add(time);
+		getChildren().add(timeSlider);
 		getChildren().add(volume);
-		getChildren().add(vol);
+		getChildren().add(volSlider);
 		
 		
 		getChildren().add(muteButton);
@@ -78,13 +78,13 @@ public class FunctionalBar extends HBox {
 		muteButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
-				if (vol.getValue() != 0) {
+				if (volSlider.getValue() != 0) {
 					player.setVolume(0);
 					muteButton.setText("Unmute");
-					vol.setValue(0);
+					volSlider.setValue(0);
 				} else {
 					player.setVolume(100);
-					vol.setValue(100);
+					volSlider.setValue(100);
 					muteButton.setText("Mute");
 				}
 			}
@@ -113,7 +113,7 @@ public class FunctionalBar extends HBox {
 					player.stop();
 					player.setRate(1);
 					playButton.setText("Play");
-					time.setValue(0);
+					timeSlider.setValue(0);
 				}
 			}
 		});
@@ -148,20 +148,20 @@ public class FunctionalBar extends HBox {
 			}
 		});
 
-		time.valueProperty().addListener(new InvalidationListener() {
+		timeSlider.valueProperty().addListener(new InvalidationListener() {
 
 			public void invalidated(Observable observable) {
-				if (time.isPressed()) {
-					player.seek(player.getMedia().getDuration().multiply(time.getValue() / 100));
+				if (timeSlider.isPressed()) {
+					player.seek(player.getMedia().getDuration().multiply(timeSlider.getValue() / 100));
 				}
 			}
 		});
 		
-		vol.valueProperty().addListener(new InvalidationListener() {
+		volSlider.valueProperty().addListener(new InvalidationListener() {
 
 			public void invalidated(Observable observable) {
-				if (vol.isPressed()) {
-					player.setVolume(vol.getValue()/100);
+				if (volSlider.isPressed()) {
+					player.setVolume(volSlider.getValue()/100);
 				}
 			}
 		});
@@ -170,7 +170,7 @@ public class FunctionalBar extends HBox {
 	protected void updateValues() {
 		Platform.runLater(new Runnable() {
 			public void run() {
-				time.setValue(player.getCurrentTime().toMillis() / player.getTotalDuration().toMillis() * 100);
+				timeSlider.setValue(player.getCurrentTime().toMillis() / player.getTotalDuration().toMillis() * 100);
 			}
 		});
 	}

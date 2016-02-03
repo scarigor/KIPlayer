@@ -10,14 +10,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-	Player playerVAR;
+	KIPlayer player;
 	FileChooser fileCh;
 
 	public void start(final Stage primaryStage) {
@@ -49,30 +48,67 @@ public class Main extends Application {
 		menu.getMenus().add(file);
 		menu.getMenus().add(playing);
 		menu.getMenus().add(playlist);
-		primaryStage.setTitle("KIPlayer v.1.0");
-	//	Image image = new Image("file:///D:/OOP/Workspace/KIPlayer/src/application/res/load.jpg");
-		playerVAR = new Player("file:///D:/sample.mp4");
+		// Image image = new
+		// Image("file:///D:/OOP/Workspace/KIPlayer/src/application/res/load.jpg");
+		File startLoading = new File("res/load.mp4");
+		player = new KIPlayer(startLoading);
+		player.mPlayer.setCycleCount(5);
+		player.setBottom(menu);
 
-		playerVAR.setBottom(menu);
+		Scene scene = new Scene(player, 720, 480);
 
-		Scene scene = new Scene(playerVAR, 720, 480);
+		primaryStage.setResizable(false);
+		primaryStage.setTitle("KIPlayer");
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
 		open.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
-
+				
 				File file = fileCh.showOpenDialog(primaryStage);
 				if (file != null) {
 					try {
-						playerVAR = new Player(file.toURI().toURL().toExternalForm());
-						Scene scene = new Scene(playerVAR, 720, 480);
+						player.mPlayer.stop();
+						player = new KIPlayer(file.toURI().toURL().toExternalForm());
+						player.setBottom(menu);
+						Scene scene = new Scene(player, 720, 480);
 						primaryStage.setScene(scene);
-						primaryStage.show();
-						primaryStage.sizeToScene();
-						primaryStage.setTitle(file.getName() + " - KIPlayer v.1.0");
-						playerVAR.setBottom(menu);
+						primaryStage.setResizable(true);
+						primaryStage.setTitle(file.getName() + " - KIPlayer");
+						player.view.setPreserveRatio(false);
+						
+						scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+							public void handle(MouseEvent event) {
+								Status status = player.mPlayer.getStatus();
+
+								if (event.getClickCount() == 1) {
+									if (status == Status.PLAYING) {
+										if (player.mPlayer.getCurrentTime().greaterThanOrEqualTo(player.mPlayer.getTotalDuration())) {
+											player.mPlayer.seek(player.mPlayer.getStartTime());
+											player.mPlayer.play();
+										} else {
+											player.mPlayer.pause();
+
+										}
+									}
+
+									if (status == Status.PAUSED || status == Status.HALTED || status == Status.STOPPED) {
+										player.mPlayer.play();
+
+									}
+								} else {
+									if (((event.getClickCount() == 2)) && (primaryStage.isFullScreen() == true)) {
+
+										primaryStage.setFullScreen(false);
+									} else if ((event.getClickCount() == 2)) {
+										primaryStage.setFullScreen(true);
+
+									}
+								}
+							}
+						});
 
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
@@ -91,24 +127,20 @@ public class Main extends Application {
 
 		});
 
-		scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-			public void handle(MouseEvent event) {
-				if (((event.getClickCount() == 2)) && (primaryStage.isFullScreen() == true)) {
-					primaryStage.setFullScreen(false);
-				} else if ((event.getClickCount() == 2))
-					primaryStage.setFullScreen(true);
-
-			}
-
-		});
+		
 
 		exit.setOnAction(new EventHandler<ActionEvent>() {
 
-			@Override
 			public void handle(ActionEvent event) {
 				primaryStage.close();
 
+			}
+		});
+
+		playlist.setOnAction(new EventHandler<ActionEvent>() {
+
+			public void handle(ActionEvent event) {
+				Playlist.OpenPlaylist();
 			}
 		});
 
