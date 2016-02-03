@@ -1,8 +1,6 @@
 package application;
 
-
 import java.io.File;
-import java.net.MalformedURLException;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
@@ -13,67 +11,52 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
 public class KIPlayer extends BorderPane {
-	
-	
+
 	Media media;
-	MediaPlayer mPlayer;
-	MediaView view;
-	Pane stpane,mpane;
-	FunctionalBar bar;
-	public KIPlayer(String file){
+	MediaPlayer kiplayer;
+	MediaView mview;
+	Pane mpane, impane, stpane;
+	FunctionalBar fbar;
+
+	public KIPlayer(String file) {
+
 		media = new Media(file);
-		mPlayer = new MediaPlayer(media);
-		view = new MediaView(mPlayer);
-		
+		kiplayer = new MediaPlayer(media);
+		mview = new MediaView(kiplayer);
 		mpane = new Pane();
-		mpane.getChildren().add(view);
-		
-		bar = new FunctionalBar(mPlayer);
+
+		mpane.getChildren().add(mview);
+
 		setCenter(mpane);
-		setTop(bar);
-		mPlayer.play();
-		mPlayer.setAutoPlay(true);
-		
-		DoubleProperty width = view.fitWidthProperty();
-		DoubleProperty height = view.fitHeightProperty();
-		width.bind(Bindings.selectDouble(view.sceneProperty(), "width"));
-		height.bind(Bindings.selectDouble(view.sceneProperty(), "height"));
+
+		fbar = new FunctionalBar(kiplayer);
+
+		setTop(fbar);
+
+		fbar.setStyle("-fx-backgroung-color: #bfc2c7;");
+
+		kiplayer.play();
+
+		DoubleProperty width = mview.fitWidthProperty();
+		DoubleProperty height = mview.fitHeightProperty();
+
+		width.bind(Bindings.selectDouble(mview.sceneProperty(), "width"));
+		height.bind(Bindings.selectDouble(mview.sceneProperty(), "height"));
 	}
-	
-//	public Player (Image img){
-//		
-//		ImageView iv1 = new ImageView();
-//        iv1.setImage(img);
-//        impane = new Pane();
-//        impane.getChildren().add(iv1);
-//        setCenter(impane);
-//        
-//        
-//	}
-	
-	public KIPlayer(File file) { 
-		if (file != null) { 
-		try { 
-		media = new Media(file.toURI().toURL().toExternalForm()); 
-		mPlayer = new MediaPlayer(media); 
-		view = new MediaView(mPlayer); 
-		stpane = new Pane(); 
 
-		stpane.getChildren().add(view); 
+	public KIPlayer(File file) {
+		if (file != null) {
+			media = new Media(getClass().getResource("/res/load.mp4").toString());
+			kiplayer = new MediaPlayer(media);
+			mview = new MediaView(kiplayer);
+			stpane = new Pane();
 
-		setCenter(stpane); 
+			stpane.getChildren().add(mview);
 
-		setTop(bar);
-		mPlayer.play(); 
+			setCenter(stpane);
 
-		} catch (MalformedURLException e) { 
-
-		e.printStackTrace(); 
-		} 
+			kiplayer.play();
 
 		}
-	
-
 	}
-	
 }

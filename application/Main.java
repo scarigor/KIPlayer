@@ -6,96 +6,91 @@ import java.net.MalformedURLException;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.MediaPlayer.Status;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.scene.paint.Color;
 
 public class Main extends Application {
+
 	KIPlayer player;
-	FileChooser fileCh;
+	FileChooser fileChooser;
 
 	public void start(final Stage primaryStage) {
 
-		MenuItem open = new MenuItem("Open");
-		MenuItem fullscreen = new MenuItem("FullScreen");
-		MenuItem exit = new MenuItem("Exit");
-		MenuItem about = new MenuItem("About");
-		MenuItem stop = new MenuItem("Stop");
-		MenuItem play = new MenuItem("Play");
-		MenuItem pause = new MenuItem("Pause");
-
-		Menu file = new Menu("File");
-		Menu playing = new Menu("Playing");
-		Menu playlist = new Menu("Playlist");
+		
 		MenuBar menu = new MenuBar();
-
-		file.getItems().add(open);
-		file.getItems().add(about);
+		
+		Menu playing = new Menu("Playing");
+		Menu file = new Menu("Open");
+		Menu about = new Menu("About");
+		
+		MenuItem openv = new MenuItem("Open video");
+		MenuItem openm = new MenuItem("Open music");
+		MenuItem setfc = new MenuItem("Fullscreen");
+		MenuItem exit = new MenuItem("Exit");
+		MenuItem aboutus = new MenuItem("About Us");
+		
+		
+		file.getItems().add(openv);
+		file.getItems().add(openm);
 		file.getItems().add(exit);
-
-		playing.getItems().add(stop);
-		playing.getItems().add(play);
-		playing.getItems().add(pause);
-		playing.getItems().add(fullscreen);
-
-		fileCh = new FileChooser();
-
+		
 		menu.getMenus().add(file);
 		menu.getMenus().add(playing);
-		menu.getMenus().add(playlist);
-		// Image image = new
-		// Image("file:///D:/OOP/Workspace/KIPlayer/src/application/res/load.jpg");
-		File startLoading = new File("res/load.mp4");
-		player = new KIPlayer(startLoading);
-		player.mPlayer.setCycleCount(5);
-		player.setBottom(menu);
+		menu.getMenus().add(about);
+		
+		about.getItems().add(aboutus);
+		playing.getItems().add(setfc);
+		
+		fileChooser = new FileChooser();
 
-		Scene scene = new Scene(player, 720, 480);
-
-		primaryStage.setResizable(false);
-		primaryStage.setTitle("KIPlayer");
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		open.setOnAction(new EventHandler<ActionEvent>() {
+		openv.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
-				
-				File file = fileCh.showOpenDialog(primaryStage);
+
+				player.kiplayer.stop();
+				fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("avi, mp4", "*.avi", "*.mp4"));
+				File file = fileChooser.showOpenDialog(primaryStage);
+
 				if (file != null) {
 					try {
-						player.mPlayer.stop();
+
 						player = new KIPlayer(file.toURI().toURL().toExternalForm());
+						Scene scene = new Scene(player, 720, 480, Color.BLACK);
 						player.setBottom(menu);
-						Scene scene = new Scene(player, 720, 480);
 						primaryStage.setScene(scene);
+						primaryStage.show();
 						primaryStage.setResizable(true);
-						primaryStage.setTitle(file.getName() + " - KIPlayer");
-						player.view.setPreserveRatio(false);
+						primaryStage.setTitle("| Now: " + file.getName() + " | KIPlayer v.1.3 |");
+						player.mview.setPreserveRatio(false);
+						
 						
 						scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 							public void handle(MouseEvent event) {
-								Status status = player.mPlayer.getStatus();
+								Status status = player.kiplayer.getStatus();
 
 								if (event.getClickCount() == 1) {
 									if (status == Status.PLAYING) {
-										if (player.mPlayer.getCurrentTime().greaterThanOrEqualTo(player.mPlayer.getTotalDuration())) {
-											player.mPlayer.seek(player.mPlayer.getStartTime());
-											player.mPlayer.play();
+										if (player.kiplayer.getCurrentTime()
+												.greaterThanOrEqualTo(player.kiplayer.getTotalDuration())) {
+											player.kiplayer.seek(player.kiplayer.getStartTime());
+											player.kiplayer.play();
 										} else {
-											player.mPlayer.pause();
+											player.kiplayer.pause();
 
 										}
 									}
 
-									if (status == Status.PAUSED || status == Status.HALTED || status == Status.STOPPED) {
-										player.mPlayer.play();
+									if (status == Status.PAUSED || status == Status.HALTED
+											|| status == Status.STOPPED) {
+										player.kiplayer.play();
 
 									}
 								} else {
@@ -111,24 +106,67 @@ public class Main extends Application {
 						});
 
 					} catch (MalformedURLException e) {
+
 						e.printStackTrace();
 					}
 				}
-
 			}
 		});
 
-		fullscreen.setOnAction(new EventHandler<ActionEvent>() {
+		openm.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
-				primaryStage.setFullScreen(true);
 
+				player.kiplayer.stop();
+				fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("mp3", "*.mp3"));
+				File file = fileChooser.showOpenDialog(primaryStage);
+
+				if (file != null) {
+					try {
+						player = new KIPlayer(file.toURI().toURL().toExternalForm());
+						player.setBottom(menu);
+						Scene scene = new Scene(player, 640, 70, Color.BLACK);
+						primaryStage.setScene(scene);
+						primaryStage.setResizable(true);
+						primaryStage.setTitle("| Now: " + file.getName() + " | KIPlayer v.1.3 |");
+					} catch (MalformedURLException e) {
+
+						e.printStackTrace();
+					}
+				}
 			}
-
 		});
 
-		
+		setfc.setOnAction(new EventHandler<ActionEvent>() {
 
+			public void handle(ActionEvent event) {
+				if (primaryStage.isFullScreen() == false && primaryStage.isResizable() == true) {
+					primaryStage.setFullScreen(true);
+				} else
+					primaryStage.setFullScreen(false);
+			}
+		});
+
+		aboutus.setOnAction(new EventHandler<ActionEvent>() {
+
+			public void handle(ActionEvent event) {
+				Aboutus.AboutUs();
+			}
+		});
+
+		File startl = new File(getClass().getResource("/res/load.mp4").toString());
+		player = new KIPlayer(startl);
+		player.mview.setPreserveRatio(false);
+		player.kiplayer.setCycleCount(5);
+		player.setBottom(menu);
+		Scene scene = new Scene(player, 710, 480, Color.BLACK);
+		primaryStage.setTitle("KIPlayer v.1.3");
+		primaryStage.setScene(scene);
+		primaryStage.show();
+		primaryStage.centerOnScreen();
+		primaryStage.setResizable(false);
+		
+		
 		exit.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
@@ -136,14 +174,6 @@ public class Main extends Application {
 
 			}
 		});
-
-		playlist.setOnAction(new EventHandler<ActionEvent>() {
-
-			public void handle(ActionEvent event) {
-				Playlist.OpenPlaylist();
-			}
-		});
-
 	}
 
 	public static void main(String[] args) {
