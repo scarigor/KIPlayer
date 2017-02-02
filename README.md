@@ -1,1 +1,1 @@
-KPlayer - simple JAVA FX video/audio player application.
+KIPlayer - simple JAVA FX video/audio player application.
